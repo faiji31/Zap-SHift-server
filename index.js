@@ -25,6 +25,22 @@ async function run() {
     
     await client.connect();
 
+    const db = client.db('zap_shift_db')
+    const parcelsCollection = db.collection('parcels')
+
+
+//     parcel api
+app.get('/parcels',async(req,res)=>{
+
+})
+
+app.post('/parcels',async(req,res)=>{
+      const parcel = req.body;
+      const result = await parcelsCollection.insertOne(parcel)
+      res.send(result)
+})
+
+
 
 
    
