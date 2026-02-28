@@ -3,7 +3,7 @@ const cors = require('cors')
 require('dotenv').config()
 const app = express()
 const port = process.env.PORT || 5000;
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
 
 // middleware
@@ -47,6 +47,14 @@ app.get('/parcels',async(req,res)=>{
 
 })
 
+app.get('/parcels/:id', async(req,res)=>{
+
+  const id = req.params.id;
+  const query = {_id: new ObjectId(id)}
+  const result = await parcelsCollection.findOne(query)
+  res.send(result)
+})
+
 app.post('/parcels',async(req,res)=>{
       const parcel = req.body;
       parcel.createdAt = new Date()
@@ -54,6 +62,15 @@ app.post('/parcels',async(req,res)=>{
       res.send(result)
 })
 
+app.delete('/parcels/:id',async(req,res)=>{
+  const id = req.params.id;
+  const query ={_id : new ObjectId(id)}
+
+
+  const result = await parcelsCollection.deleteOne(query);
+  res.send(result)
+
+})
 
 
 
