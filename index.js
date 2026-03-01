@@ -1,4 +1,5 @@
 const express = require('express')
+const stripe = require('stripe')(process.env.STRIPE_SECRET);
 const cors = require('cors')
 require('dotenv').config()
 const app = express()
@@ -82,6 +83,31 @@ app.delete('/parcels/:id',async(req,res)=>{
   }
 }
 run().catch(console.dir);
+
+
+app.post('/create-checkout-session',async(req,res)=>{
+  const PaymentInfo = req.body;
+   const session = await stripe.checkout.sessions.create({
+    line_items: [
+      {
+       
+        price_data:{
+          currency: 'USD',
+          unit_amount:1500,
+          product_data:{
+            name:PaymentInfo.parcelname
+          }
+        },
+       
+        quantity: 1,
+      },
+    ],
+     customerEmail : PaymentInfo.senderemail,
+    mode: 'payment',
+
+    success_url: `${process.env.SITE_DOMAIN }/dashboard/payment-success`,
+  });
+})
 
 app.get('/', (req, res) => {
   res.send('Zap is Shiftinggggg!')
