@@ -1,7 +1,8 @@
-const express = require('express')
-const stripe = require('stripe')(process.env.STRIPE_SECRET);
-const cors = require('cors')
 require('dotenv').config()
+const express = require('express')
+const stripe = require('stripe')(process.env.STRIPE_SECRET)
+const cors = require('cors')
+
 const app = express()
 const port = process.env.PORT || 5000;
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
@@ -87,13 +88,14 @@ run().catch(console.dir);
 
 app.post('/create-checkout-session',async(req,res)=>{
   const PaymentInfo = req.body;
+  const amount = parseFloat(PaymentInfo.cost) * 100;
    const session = await stripe.checkout.sessions.create({
     line_items: [
       {
        
         price_data:{
-          currency: 'USD',
-          unit_amount:1500,
+          currency: 'usd',
+          unit_amount:amount,
           product_data:{
             name:PaymentInfo.parcelname
           }
@@ -102,11 +104,17 @@ app.post('/create-checkout-session',async(req,res)=>{
         quantity: 1,
       },
     ],
-     customerEmail : PaymentInfo.senderemail,
+     customer_email : PaymentInfo.senderemail,
+     metadata:{
+      parcelId :PaymentInfo.parcelId
+     },
     mode: 'payment',
 
-    success_url: `${process.env.SITE_DOMAIN }/dashboard/payment-success`,
+    success_url: `${process.env.SITE_DOMAIN}/dashboard/payment-success`,
+    cancel_url: `${process.env.SITE_DOMAIN}/dashboard/payment-cancel`,
   });
+  console.log(session)
+  res.send({url: session.url})
 })
 
 app.get('/', (req, res) => {
