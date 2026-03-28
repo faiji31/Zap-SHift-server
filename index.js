@@ -224,6 +224,19 @@ app.patch('/payment-success', async (req, res) => {
 
 })
 
+// Payment releted apis
+app.get('/payment',async(req,res)=>{
+  const email = req.query.email;
+  const query = {}
+  if(email){
+    query.customerEmail = email;
+
+  }
+  const cursor = paymentCollection.find(query)
+  const result = await cursor.toArray();
+  res.send(result)
+})
+
 app.get('/', (req, res) => {
   res.send('Zap is Shiftinggggg!')
 })
